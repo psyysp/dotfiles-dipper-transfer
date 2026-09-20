@@ -1,0 +1,17 @@
+# This is Git's per-user configuration file.
+[user]
+	name = <redacted>
+	email = <redacted>
+# Please adapt and uncomment the following lines:
+#	name = <redacted>
+#	email = <redacted>
+## Fix for fetch-pack: unexpected disconnect while reading sideband packet
+[core] 
+    packedGitLimit = 512m 
+    packedGitWindowSize = 512m 
+	excludesFile = ~/.gitignore_global
+[pack] 
+    deltaCacheSize = 2047m 
+    packSizeLimit = 2047m 
+    windowMemory = 2047m
+

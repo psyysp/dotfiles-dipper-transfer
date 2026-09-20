@@ -1,0 +1,113 @@
+# .dotdipperignore — gitignore-style patterns for dotdipper discover
+# Lines starting with # are comments.  Blank lines are ignored.
+# Patterns prefixed with ~/ are anchored to $HOME.
+
+# --- Dotdipper internal (generated / runtime) ---
+~/.config/dotdipper/compiled/**
+~/.config/dotdipper/cache/**
+~/.config/dotdipper/install/**
+~/.config/dotdipper/manifest.lock
+~/.config/dotdipper/snapshots/**
+~/.config/dotdipper/profiles/**
+~/.config/dotdipper/bundle*.tar.zst
+~/.config/dotdipper/daemon.pid
+
+# --- Cryptographic keys & secrets ---
+~/.ssh/**
+~/.gnupg/**
+~/.config/age/keys.txt
+**/*.key
+**/*.pem
+**/*.pfx
+**/*.p12
+**/*.keystore
+
+# --- Credentials & tokens ---
+**/credentials.db
+**/access_tokens.db
+**/tokens.json
+**/legacy_credentials/**
+~/.config/gh/hosts.yml
+~/.config/gcloud/**
+
+# --- Environment & secret files ---
+**/.env
+**/.env.local
+**/.env.production
+**/.env.*.local
+**/secrets/**
+**/.secret*
+**/*.secret
+
+# --- Build & dependency artifacts ---
+**/node_modules/**
+**/.git/**
+**/target/**
+**/dist/**
+**/build/**
+**/__pycache__/**
+**/.venv/**
+
+# --- OS & editor junk ---
+**/.DS_Store
+**/Thumbs.db
+**/*.swp
+**/*.swo
+**/*~
+
+# --- Caches, logs & temp ---
+**/cache/**
+**/Cache/**
+**/tmp/**
+**/temp/**
+**/logs/**
+**/*.log
+
+# --- Backup files (auto-generated) ---
+**/*.bak
+**/*.bak.*
+**/*.backup
+**/backup-*
+**/old-*
+**/temp-*
+**/automatic_backups/**
+
+# --- Application state (machine-specific) ---
+~/.config/configstore/**
+**/sockets/**
+**/*.db
+**/*.sqlite
+**/*.sqlite3
+
+# --- Trash ---
+~/.local/share/Trash/**
+~/.Trash/**
+
+# --- Added 2026-09-19 privacy sweep: confirmed or likely secret-bearing ---
+~/.config/neonctl/**
+~/.config/stripe/**
+~/.config/herdr/session.json
+**/credentials.json
+**/session.json
+**/auth.json
+**/hosts.yml
+**/.netrc
+**/.npmrc
+**/.pypirc
+~/.aws/**
+~/.docker/config.json
+~/.kube/config
+~/.config/op/**
+
+# --- zsh completion caches: regenerated, embed the device name ---
+**/.zcompdump*
+
+# --- 2026-09-20 sweep: macOS pref plists embed Finder/Dock bookmark paths
+#     (recent folders, aliases) that disclose private directory names ---
+~/.config/macos/*.plist
+**/com.apple.*.plist
+
+# --- Cached vendor artifacts and rc archives (not dotfiles) ---
+~/.config/zsh/archive/**
+**/openapi-spec.json
+**/*.backup-*

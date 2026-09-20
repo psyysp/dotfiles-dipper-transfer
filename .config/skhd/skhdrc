@@ -1,0 +1,97 @@
+##SKHD STUFF
+
+## if you're having troubles finding key codes for a key just type skhd --observe in a terminal and type a key. Pretty cool! Or just check the wiki.
+
+## Quickly restart the yabai launch agent
+ctrl + alt + cmd - r : yabai --restart-service
+
+## Close active application
+hyper - backspace : $(yabai -m window $(yabai -m query --windows --window | jq -re ".id") --close)
+
+## focus window
+alt - h : yabai -m window --focus west
+alt - j : yabai -m window --focus south
+alt - k : yabai -m window --focus north
+alt - l : yabai -m window --focus east 
+
+## swap managed window
+# hyper - 0x21 : yabai -m window --swap east # 0x21 is the "[" key
+shift + alt - h : yabai -m window --swap west 
+shift + alt - j : yabai -m window --swap south  
+shift + alt - k : yabai -m window --swap north 
+shift + alt - l : yabai -m window --swap east 
+
+## balance size of windows
+shift + alt - 0 : yabai -m space --balance
+# alt - 0 : yabai -m space --balance
+
+## move to a diff space (note: neither of these work lol)
+# ctrl - 6 : yabai -m space --focus 6;
+# index=6; eval "$(yabai -m query --spaces | jq --argjson index "${index}" -r '(.[] | select(.index == $index).windows[0]) as $wid | if $wid then "yabai -m window --focus \"" + ($wid | tostring) + "\"" else "skhd --key \"ctrl - " + (map(select(."is-native-fullscreen" == false)) | index(map(select(.index == $index))) + 1 % 10 | tostring) + "\"" end')"
+
+## move window and focus desktop
+shift + alt - 1 : yabai -m window --space 1; $HOME/.config/custom-scripts/switch-spaces/switchToSpace1.sh
+shift + alt - 2 : yabai -m window --space 2; $HOME/.config/custom-scripts/switch-spaces/switchToSpace2.sh
+shift + alt - 3 : yabai -m window --space 3; $HOME/.config/custom-scripts/switch-spaces/switchToSpace3.sh
+shift + alt - 4 : yabai -m window --space 4; $HOME/.config/custom-scripts/switch-spaces/switchToSpace4.sh
+shift + alt - 5 : yabai -m window --space 5; $HOME/.config/custom-scripts/switch-spaces/switchToSpace5.sh
+shift + alt - 6 : yabai -m window --space 6; $HOME/.config/custom-scripts/switch-spaces/switchToSpace6.sh
+# shift + alt - 7 : yabai -m window --space 7; $HOME/.config/custom-scripts/switch-spaces/switchToSpace7.sh
+shift + alt - 7 : yabai -m window --space 7; $HOME/.config/custom-scripts/switch-spaces/switchToSpaceTilde.sh
+shift + alt - 8 : yabai -m window --space 8; $HOME/.config/custom-scripts/switch-spaces/switchToSpace8.sh
+shift + alt - 9 : yabai -m window --space 9; $HOME/.config/custom-scripts/switch-spaces/switchToSpace9.sh
+shift + alt - 0x32 : yabai -m window --space 7; $HOME/.config/custom-scripts/switch-spaces/switchToSpaceTilde.sh
+# shift + alt - 6 : yabai -m window --space 6; yabai -m space --focus 6
+
+shift + alt - b : yabai -m space --focus 2
+
+# increase window size
+# shift + alt + fn - h : yabai -m window --resize left:-20:0
+# shift + alt + fn - j : yabai -m window --resize bottom:0:20
+# shift + alt + fn - k : yabai -m window --resize top:0:-20
+# shift + alt + fn - l : yabai -m window --resize right:20:0
+
+# decrease window size
+# shift + alt + ctrl - h : yabai -m window --resize right:-20:0
+# shift + alt + ctrl - j : yabai -m window --resize top:0:20
+# shift + alt + ctrl - k : yabai -m window --resize bottom:0:-20
+# shift + alt + ctrl - l : yabai -m window --resize left:20:0
+
+# increase/decrease window size with same keybinds
+shift + alt + ctrl - h : \
+    yabai -m window --resize left:-20:0 ; \
+    yabai -m window --resize right:-20:0
+
+shift + alt + ctrl - j : \
+    yabai -m window --resize bottom:0:20 ; \
+    yabai -m window --resize top:0:20
+
+shift + alt + ctrl - k : \
+    yabai -m window --resize top:0:-20 ; \
+    yabai -m window --resize bottom:0:-20
+
+shift + alt + ctrl - l : \
+    yabai -m window --resize right:20:0 ; \
+    yabai -m window --resize left:20:0
+
+## rotate tree 90
+# hyper - r : yabai -m space --rotate 90
+alt - r : yabai -m space --rotate 90
+
+## mirror tree y-axis (flip the tree vertically)
+# hyper - i : yabai -m space --mirror y-axis
+alt - y : yabai -m space --mirror y-axis
+## mirror tree x-axis (flip the tree horizontally)
+alt - x : yabai -m space --mirror x-axis
+
+## toggle window fullscreen zoom
+# hyper - f : yabai -m window --toggle zoom-fullscreen
+alt - f : yabai -m window --toggle zoom-fullscreen
+
+## cycle through windows
+## cycle backwards
+# hyper - i : yabai -m query --spaces | jq -re ".[] | select(.visible == 1).index" | xargs -I{} yabai -m query --windows --space {} | jq -sre "add | sort_by(.display, .frame.x, .frame.y, .id) | nth(index(map(select(.focused == 1))) - 1).id" | xargs -I{} yabai -m window --focus {}
+# hyper - i : yabai -m query --spaces | jq -re ".[] | select(.visible == 1).index" | xargs -I{} yabai -m query --windows --space {} | jq -sre "add | sort_by(.display, .frame.x, .frame.y, .id) | nth(index(map(select(.focused == 1))) - 1).id" | xargs -I{} yabai -m window --focus {}
+
+# hyper - 0x29 : yabai -m query --spaces
+

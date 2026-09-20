@@ -1,0 +1,1 @@
+-- Intentionally empty: use LazyVim defaults without adding custom autocmds.

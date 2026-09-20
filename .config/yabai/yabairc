@@ -1,0 +1,106 @@
+#!/usr/bin/env sh
+
+# **********************
+# **** yabai config ****
+# **********************
+# label spaces; names are used in scripts
+# custom space names for multi virtual desktop setup
+yabai -m space 1 --label one
+yabai -m space 2 --label two
+yabai -m space 3 --label three
+yabai -m space 4 --label four
+yabai -m space 5 --label five
+yabai -m space 6 --label six
+yabai -m space 7 --label seven
+yabai -m space 8 --label eight
+yabai -m space 9 --label nine
+
+# Float rules for specific apps (no need for SIP to be partially disabled)
+# most of these just diable yabai from resizing them
+yabai -m rule --add app="^System Settings$" sticky=on sub-layer=above manage=off
+yabai -m rule --add app="^Karabiner-Elements$" sticky=on sub-layer=above manage=off
+yabai -m rule --add app="^Karabiner-EventViewer$" sticky=on sub-layer=above manage=off
+yabai -m rule --add app="^Finder$" sticky=on sub-layer=above manage=off
+yabai -m rule --add app="^FaceTime$" sticky=on sub-layer=above manage=off
+yabai -m rule --add app="^Rectangle$" sticky=on sub-layer=above manage=off
+yabai -m rule --add app="^PDFgear$" sticky=on sub-layer=above manage=off
+yabai -m rule --add app="^iStat Menus.app$" sticky=on sub-layer=above manage=off
+yabai -m rule --add app="^Tailscale$" sticky=on sub-layer=above manage=off
+yabai -m rule --add app="^Rocket$" sticky=on sub-layer=above manage=off
+yabai -m rule --add app="^Simulator$" sticky=on sub-layer=above manage=off
+yabai -m rule --add app="^iStat Menus 6$" sticky=on sub-layer=above manage=off
+yabai -m rule --add app="^iStat Menus 7$" sticky=on sub-layer=above manage=off
+yabai -m rule --add app="^Disk Utility$" sticky=on sub-layer=above manage=off
+yabai -m rule --add app="^System Information$" sticky=on sub-layer=above manage=off
+yabai -m rule --add app="^Activity Monitor$" sticky=on sub-layer=above manage=off
+yabai -m rule --add app="^Spotify$" manage=off
+yabai -m rule --add app="^console$" manage=off
+yabai -m rule --add app="^Music$" manage=off
+
+# apply all rules to existing windows
+yabai -m rule --apply
+
+
+# *****************************
+# **** global config stuff ****
+# *****************************
+# New window spawns to the right if vertical split, or bottom if horizontal split
+yabai -m config window_placement second_child
+
+# opacity
+yabai -m config window_opacity off
+yabai -m config window_opacity_duration 0.0
+yabai -m config active_window_opacity 1.0
+#yabai -m config normal_window_opacity        0.97
+
+# other settings
+yabai -m config auto_balance off
+yabai -m config split_ratio 0.50
+
+# # set mouse interaction modifier key (default: fn)
+yabai -m config mouse_modifier ctrl
+
+# set modifier + right-click drag to resize window (default: resize)
+yabai -m config mouse_action2 resize
+
+# set modifier + left-click drag to resize window (default: move)
+yabai -m config mouse_action1 move
+
+# change how yabai looks
+yabai -m config layout bsp
+yabai -m config top_padding 0
+yabai -m config bottom_padding 0
+yabai -m config left_padding 0
+yabai -m config right_padding 0
+yabai -m config window_gap 5
+
+
+# *****************
+# **** signals ****
+# *****************
+# if i close the active window, focus on any other visible window.
+yabai -m signal --add event=window_destroyed action="$HOME/custom-scripts/switch-spaces/window-focus-on-destroy.sh"
+
+# allows focus to be set on other window in space after active window is closed
+yabai -m signal --add event=window_destroyed action="yabai -m query --windows --window &> /dev/null || yabai -m window --focus mouse"
+yabai -m signal --add event=application_terminated action="yabai -m query --windows --window &> /dev/null || yabai -m window --focus mouse"
+
+echo "yabai configuration loaded..."
+#END
+
+
+
+# ****************
+# **** unused ****
+# ****************
+# general space settings
+#yabai -m config focused_border_skip_floating  1
+#yabai -m config --space 3 layout             float
+
+# mouse following
+#yabai -m config focus_follows_mouse          autoraise
+#yabai -m config focus_follows_mouse          on
+
+# window border (this could be deprecated)
+#yabai -m config window_border                on | off
+#yabai -m config window_shadow float

@@ -1,0 +1,79 @@
+exclude_patterns = []
+include_patterns = [
+    "~/.config/**",
+    "~/.zshrc",
+    "~/.bashrc",
+    "~/.profile",
+    "~/.gitconfig",
+    "~/.gitignore_global",
+    "~/.vimrc",
+    "~/.tmux.conf",
+    "~/.ssh/config",
+]
+push_ignore = [
+    "**/*.backup-*",
+    "**/*.bak.*",
+    "**/*.zcompdump*",
+    "**/.netrc",
+    "**/.npmrc",
+    "**/.pypirc",
+    "**/.zcompdump*",
+    "**/auth.json",
+    "**/backup-*",
+    "**/com.apple.*.plist",
+    "**/credentials.json",
+    "**/hosts.yml",
+    "**/old-*",
+    "**/openapi-spec.json",
+    "**/session.json",
+    "**/temp-*",
+    "~/.aws/**",
+    "~/.config/configstore/**",
+    "~/.config/gcloud/**",
+    "~/.config/herdr/session.json",
+    "~/.config/macos/*.plist",
+    "~/.config/neonctl/**",
+    "~/.config/op/**",
+    "~/.config/stripe/**",
+    "~/.config/zsh/archive/**",
+    "~/.docker/config.json",
+    "~/.kube/config",
+]
+
+[files."~/.config/zsh/.zshrc"]
+exclude = false
+local_only = false
+mode = "copy"
+
+[general]
+active_profile = "default"
+backup = true
+default_mode = "symlink"
+
+[github]
+private = true
+public_repo_name = "<redacted>"
+repo_name = "<redacted>"
+username = "<redacted>"
+
+[hooks]
+post_apply = [
+    'ln -sfn "$HOME/.config/zsh/.zshrc" "$HOME/.zshrc"',
+    'bash "$HOME/.config/macos/defaults.sh"',
+]
+post_snapshot = []
+pre_apply = []
+pre_snapshot = []
+
+[packages]
+arch = []
+common = [
+    "git",
+    "vim",
+    "tmux",
+    "curl",
+    "wget",
+]
+linux = []
+macos = []
+ubuntu = []

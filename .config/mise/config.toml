@@ -1,0 +1,5 @@
+# Global defaults. Project dirs can override with mise.toml, .nvmrc, or .ruby-version.
+# Shell uses shims (~/.local/share/mise/shims on PATH), not `mise activate`.
+[tools]
+node = "22"
+ruby = "3.2"
