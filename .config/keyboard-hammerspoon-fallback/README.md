@@ -15,49 +15,61 @@ Uses only the Accessibility API. No system or driver extension is involved.
 | Left Shift + Right Shift toggles Caps Lock | "Toggle caps_lock by pressing left_shift then right_shift" |
 | Control + `[` sends Escape | "Map ctrl + [ to escape" |
 
-## Files
+## Choose how Caps Lock becomes Control
 
-- `init.lua` — install to `~/.hammerspoon/init.lua`
-- `local.hidutil.capslock.plist` — install to `~/Library/LaunchAgents/`
+Pick one. The `CAPS_IS` setting at the top of `init.lua` must match.
+
+### Option A — System Settings (simplest, the default)
+
+System Settings, Keyboard, Keyboard Shortcuts, Modifier Keys: set Caps Lock to
+Control. Leave `CAPS_IS = "left"`. Nothing else to install.
+
+Trade-off: macOS maps Caps Lock to **Left** Control, so the physical Left
+Control key is indistinguishable from it and tapping that key alone also sends
+Escape.
+
+### Option B — hidutil LaunchAgent
+
+Maps Caps Lock to **Right** Control, so the physical Left Control key keeps its
+ordinary behavior. Set `CAPS_IS = "right"` in `init.lua`, then:
+
+```sh
+cp local.hidutil.capslock.plist ~/Library/LaunchAgents/
+launchctl bootstrap gui/$(id -u) ~/Library/LaunchAgents/local.hidutil.capslock.plist
+```
+
+Copying the plist is not enough on its own. launchd only reads it at the next
+login, or when bootstrapped as above. `launchctl load` is the legacy command and
+fails quietly on current macOS.
+
+Confirm with `hidutil property --get "UserKeyMapping"`. Expect `Src 30064771129`
+(Caps Lock, HID usage 0x39) and `Dst 30064771300` (Right Control, usage 0xE4).
+A result of `(null)` means the agent never ran.
 
 ## Install
 
 ```sh
 brew install --cask hammerspoon
+mkdir -p ~/.hammerspoon
 
-mkdir -p ~/.hammerspoon ~/Library/LaunchAgents
-cp ~/.config/keyboard-hammerspoon-fallback/init.lua ~/.hammerspoon/init.lua
-cp ~/.config/keyboard-hammerspoon-fallback/local.hidutil.capslock.plist ~/Library/LaunchAgents/
+curl -fsSL -o ~/.hammerspoon/init.lua \
+  https://raw.githubusercontent.com/<redacted>/dotfiles-dipper-transfer/main/.config/keyboard-hammerspoon-fallback/init.lua
 
-launchctl load ~/Library/LaunchAgents/local.hidutil.capslock.plist
 open -a Hammerspoon
 ```
 
 Then grant Hammerspoon **Accessibility** access in System Settings, Privacy and
-Security, Accessibility. The rules do not work until that is granted.
+Security, Accessibility. Nothing works until that is granted. After granting it,
+use the Hammerspoon menu bar icon and choose Reload Config.
 
-## Verify
-
-```sh
-hidutil property --get "UserKeyMapping"
-```
-
-Expect one entry, `Src 30064771129` (Caps Lock, HID usage 0x39) mapped to
-`Dst 30064771300` (Right Control, usage 0xE4).
-
-## Design note
-
-`hidutil` remaps Caps Lock to **Right** Control rather than Left. Hammerspoon
-keys its tap detection off Right Control, so the physical Left Control key keeps
-its ordinary behavior. The original Karabiner rule made both keys dual-role, so
-tapping real Left Control there also produced Escape.
+Verify it is alive: `pgrep -x Hammerspoon`.
 
 ## Known limits
 
 - Event taps do not fire at the login window, and macOS suppresses them during
   secure input such as password fields.
-- `hidutil` mappings are not persistent, which is why the LaunchAgent reapplies
-  the mapping at each login.
+- `hidutil` mappings are not persistent, which is why Option B needs a
+  LaunchAgent to reapply the mapping at each login.
 - Slightly higher latency than a driver-level remap.
 - Not included: the `left_ctrl + left_cmd + h/j/k/l` vim arrow rule, which also
   lives in the Karabiner config. Ask if that is wanted here too.

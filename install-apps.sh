@@ -111,19 +111,23 @@ FORMULAE=(
 
 CASKS=(
   'alacritty'
+  'among-us'
   'antigravity'
   'appcleaner'
   'arc'
   'arduino-ide'
   'balenaetcher'
+  'blackmagic-proxy-generator-lite'
   'bluestacks'
   'chatgpt'
   'claude'
   'cursor'
+  'davinci-resolve'
   'discord'
   'docker-desktop'
   'dolphin'
   'dropzone'
+  'eclipse'
   'emacs-app'
   'font-iosevka'
   'gcloud-cli'
@@ -134,6 +138,7 @@ CASKS=(
   'helium-browser'
   'istat-menus'
   'iterm2'
+  'ivanti-secure-access'
   'karabiner-elements'
   'kitty'
   'logi-options+'
@@ -233,6 +238,56 @@ if [[ ${#MAS_IDS[@]} -gt 0 ]]; then
     done
   fi
 fi
+
+# ---------------------------------------------------------------------------
+# System and driver extensions.
+#
+# `brew install --cask` reports success once the app is in place, but an app
+# that ships a driver extension is not finished at that point: macOS will not
+# load the extension until a human approves it, and some apps do not even
+# submit it for approval until the app itself has been run once. An unattended
+# install therefore leaves a working-looking machine where the extension does
+# nothing. Report that here rather than let it pass as success.
+#
+# This stage never activates anything. Activation opens a GUI approval dialog
+# and, for Karabiner, a file:// URL — neither belongs in an unattended run.
+# ---------------------------------------------------------------------------
+extension_state() {
+  systemextensionsctl list 2>/dev/null | grep -F "$1" | head -1
+}
+
+check_extensions() {
+  command -v systemextensionsctl >/dev/null 2>&1 || return 0
+  local pending=()
+
+  # Any extension already known to macOS but not yet enabled is awaiting a
+  # human. This catches every vendor, not just the ones named below.
+  while IFS= read -r line; do
+    case "$line" in
+      *"[activated enabled]"*) ;;
+      *"[activated"*|*"[terminated"*)
+        pending+=("$(printf '%s' "$line" | awk -F'\t' '{print $4}')")
+        ;;
+    esac
+  done < <(systemextensionsctl list 2>/dev/null | grep -E '^\*|^ ' || true)
+
+  # Karabiner submits its DriverKit extension only when the app or its helper
+  # runs, so a fresh unattended install leaves no row at all to detect.
+  local km="/Applications/.Karabiner-VirtualHIDDevice-Manager.app/Contents/MacOS/Karabiner-VirtualHIDDevice-Manager"
+  if [[ -x "$km" ]] && [[ -z "$(extension_state org.pqrs.Karabiner-DriverKit-VirtualHIDDevice)" ]]; then
+    warn "Karabiner installed its driver extension but never submitted it."
+    warn "  Run: \"$km\" activate"
+    warn "  Then approve it, and note that Karabiner also needs Input Monitoring."
+  fi
+
+  if [[ ${#pending[@]} -gt 0 ]]; then
+    warn "${#pending[@]} system extension(s) are installed but not enabled:"
+    for ext in "${pending[@]}"; do warn "  $ext"; done
+    warn "Approve them in System Settings > General > Login Items & Extensions."
+  fi
+}
+
+[[ "$(uname -s)" == "Darwin" ]] && check_extensions
 
 if [[ ${#FAILED[@]} -gt 0 ]]; then
   warn "${#FAILED[@]} item(s) did not install:"

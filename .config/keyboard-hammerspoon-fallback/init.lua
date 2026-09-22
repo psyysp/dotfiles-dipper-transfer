@@ -11,10 +11,14 @@
 --   2. Left Shift + Right Shift together -> toggle Caps Lock
 --   3. Control + [                       -> Escape
 --
--- Caps Lock is remapped to Right Control by hidutil, loaded at login from
--- ~/Library/LaunchAgents/local.hidutil.capslock.plist. Everything here keys
--- off Right Control, so the physical Left Control key keeps its ordinary
--- behaviour. The Karabiner rule made both keys dual-role; this does not.
+-- Set CAPS_IS below to match how Caps Lock reaches the system:
+--
+--   "left"  System Settings > Keyboard > Modifier Keys maps Caps Lock to
+--           Control. Nothing else to install. Tapping the physical Left
+--           Control key also sends Escape, since the two are indistinguishable.
+--
+--   "right" The hidutil LaunchAgent maps Caps Lock to Right Control. The
+--           physical Left Control key keeps its ordinary behaviour.
 
 local log = hs.logger.new("keys", "info")
 
@@ -28,8 +32,15 @@ local LALT   = 0x00000020 -- NX_DEVICELALTKEYMASK
 local RALT   = 0x00000040 -- NX_DEVICERALTKEYMASK
 local RCTRL  = 0x00002000 -- NX_DEVICERCTLKEYMASK
 
--- Anything that turns a Caps Lock press into a Control press.
-local OTHER_MODS = LCTRL | LSHIFT | RSHIFT | LCMD | RCMD | LALT | RALT
+-- Which Control the remapped Caps Lock arrives as. See the note above.
+local CAPS_IS = "left"
+
+local CAPS_BIT = (CAPS_IS == "right") and RCTRL or LCTRL
+
+-- Anything that turns a Caps Lock press into a Control press. The watched bit
+-- is excluded, or Caps Lock would always look like it was used as a modifier.
+local ALL_MODS = LCTRL | LSHIFT | RSHIFT | LCMD | RCMD | LALT | RALT | RCTRL
+local OTHER_MODS = ALL_MODS & ~CAPS_BIT
 
 -- Karabiner's to_if_alone default: a longer press is a plain hold, not a tap.
 local TAP_TIMEOUT = 1.0
@@ -74,7 +85,7 @@ end
 ----------------------------------------------------------------------
 -- State shared between the two taps
 ----------------------------------------------------------------------
-local capsDown = false      -- Caps Lock (now Right Control) is held
+local capsDown = false      -- the remapped Caps Lock is held
 local capsPressedAt = 0
 local capsUsedAsMod = false -- something else happened while it was held
 local shiftsLatched = false -- both shifts seen; wait for a release
@@ -84,7 +95,7 @@ local shiftsLatched = false -- both shifts seen; wait for a release
 ----------------------------------------------------------------------
 local function onFlagsChanged(e)
   local flags = rawFlags(e)
-  local caps = isSet(flags, RCTRL)
+  local caps = isSet(flags, CAPS_BIT)
 
   if caps and not capsDown then
     capsDown = true
