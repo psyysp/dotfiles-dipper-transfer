@@ -22,11 +22,16 @@ Pick one. The `CAPS_IS` setting at the top of `init.lua` must match.
 ### Option A — System Settings (simplest, the default)
 
 System Settings, Keyboard, Keyboard Shortcuts, Modifier Keys: set Caps Lock to
-Control. Leave `CAPS_IS = "left"`. Nothing else to install.
+Control. Leave `CAPS_IS = "any"`. Nothing else to install.
 
-Trade-off: macOS maps Caps Lock to **Left** Control, so the physical Left
-Control key is indistinguishable from it and tapping that key alone also sends
-Escape.
+Set it for the keyboard you actually type on. This mapping is per-keyboard, so a
+setting applied to the internal keyboard does not reach an external one.
+
+Trade-off: `"any"` matches the generic Control flag, so every Control-producing
+key gains the tap-for-Escape behavior, including the physical Left and Right
+Control keys. A Caps Lock remapped by System Settings does not reliably carry a
+device-specific modifier bit, so matching one physical key is not an option on
+this route.
 
 ### Option B — hidutil LaunchAgent
 

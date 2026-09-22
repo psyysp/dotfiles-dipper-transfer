@@ -13,9 +13,9 @@
 --
 -- Set CAPS_IS below to match how Caps Lock reaches the system:
 --
---   "left"  System Settings > Keyboard > Modifier Keys maps Caps Lock to
---           Control. Nothing else to install. Tapping the physical Left
---           Control key also sends Escape, since the two are indistinguishable.
+--   "any"   System Settings > Keyboard > Modifier Keys maps Caps Lock to
+--           Control. Nothing else to install. Every Control key gains the
+--           tap-for-Escape behaviour, Caps Lock included.
 --
 --   "right" The hidutil LaunchAgent maps Caps Lock to Right Control. The
 --           physical Left Control key keeps its ordinary behaviour.
@@ -33,9 +33,16 @@ local RALT   = 0x00000040 -- NX_DEVICERALTKEYMASK
 local RCTRL  = 0x00002000 -- NX_DEVICERCTLKEYMASK
 
 -- Which Control the remapped Caps Lock arrives as. See the note above.
-local CAPS_IS = "left"
+--   "any"   match on the generic Control flag. Works no matter which physical
+--           key produced it, including a Caps Lock remapped by System Settings,
+--           which does not always carry a device-specific bit.
+--   "left"  match the Left Control device bit only.
+--   "right" match the Right Control device bit only (the hidutil route).
+local CAPS_IS = "any"
 
-local CAPS_BIT = (CAPS_IS == "right") and RCTRL or LCTRL
+local CAPS_BIT = (CAPS_IS == "right") and RCTRL
+              or (CAPS_IS == "left") and LCTRL
+              or (LCTRL | RCTRL)
 
 -- Anything that turns a Caps Lock press into a Control press. The watched bit
 -- is excluded, or Caps Lock would always look like it was used as a modifier.
@@ -95,7 +102,14 @@ local shiftsLatched = false -- both shifts seen; wait for a release
 ----------------------------------------------------------------------
 local function onFlagsChanged(e)
   local flags = rawFlags(e)
-  local caps = isSet(flags, CAPS_BIT)
+  -- "any" reads the generic Control flag, which every Control-producing key
+  -- sets. The device-bit modes read one specific physical key.
+  local caps
+  if CAPS_IS == "any" then
+    caps = e:getFlags().ctrl and true or false
+  else
+    caps = isSet(flags, CAPS_BIT)
+  end
 
   if caps and not capsDown then
     capsDown = true
